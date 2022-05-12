@@ -1,0 +1,9 @@
+Introduction to GitHub
+Creating my first Git document.
+Hello World!
+The first thing to do is "git add file1 file2"
+The second step is "git status"
+The third step is "git commit -m "comment"
+The last step is "git push"
+I am excited about this!!
+
