@@ -1,0 +1,482 @@
+---
+title: "All3Trial Olabisi"
+author: "Olabisi Adegbesan"
+date: '2022-07-11'
+output: 
+  word_document:
+    reference_docx: RtemplateCQ.docx
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+# base size Plot
+#plotsize <- 3
+#knitr::opts_chunk$set(
+  #echo = FALSE,
+  #fig.height = 0.7 * plotsize,
+  #fig.width = plotsize,
+ # message = FALSE,
+  #warning = FALSE,
+  #comment = NA,
+  #dpi = 300,
+  #results = "asis")
+pacman::p_load(conflicted,wrappedtools,nlme,broom,
+               multcomp,tidyverse,foreign,DescTools, ez,
+               ggbeeswarm, readxl, plotrix, ggsignif, rlist, here, skimr, flextable, ftExtra, Hmisc, table1, nlme, patchwork, aomisc, deSolve, flextable, officer)#conflicted,
+# rayshader,av)
+pacman::p_unload(DescTools, foreign)
+# conflict_scout()
+conflict_prefer('select','dplyr')
+conflict_prefer('filter','dplyr')
+
+#set chunks defaults
+knitr::opts_chunk$set(
+  echo       = FALSE,
+  message    = FALSE,
+  warning    = FALSE,
+  comment = NA,
+  fig.width = 7,
+  fig.asp = 0.8,
+  out.width = "80%",
+  dpi = 300
+)
+
+# set flextable defaults
+knitr::opts_chunk$set(echo = FALSE, fig.cap = TRUE)
+  set_flextable_defaults(
+  font.family = "Arial", font.size = 9, 
+  theme_fun = "theme_vanilla",
+  big.mark="", table.layout="autofit")
+  
+# formatting properties for specific paragraphs
+centeredP <- fp_par(text.align = "center")
+
+
+```
+
+# Information for the datasets 
+## Dosing
+For all three trials, oral bolus doses were administered to subjects and dose amount administered can be found in the column DoseAMT (unit: mg)
+
+## Observations
+**StudyID**: Trial ID
+**ID**: subject ID
+**Time (hour)**: the observation time points. 
+**C1Obs (mg/L)**: observation for plasma parent drug concentration
+**CmObs (mg/L)**: observation for plasma metaolite concentration
+**AuObs (mg)**: observation for parent drug in urine 
+**PDRObs**: observation for PD effect 
+**Note**: BQL value for parent drug is chosen to be 6.5e-3, and the one for metabolite is 6.5e-4.
+
+## Covariates
+**Sex**: 0 denotes male, and 1 denotes female
+**Age** (years)
+**Height (m)**
+**Weight (kg)**
+**Scr (mg/100ml)**: serum creatinine 
+**ESRD**: indicator of whether the subject is in ESRD stage or not (1 means yes, 0 means no)
+**Alb (g/100ml)**: serum albumin
+**LabID**: the ID for the lab to which a subject is assigned to 
+**nDrugs**: number of drugs taken by the subject
+**nDiseases**: number of diseases that a subject has
+
+# Import and Cleaning Data 
+```{r import_strucrure}
+
+all3trial <- read.csv("Data/All_3_study.csv") |>
+  mutate(C1Obs=str_replace(C1Obs,'BQL', '6.5e-3'),
+    CmObs=str_replace(CmObs,'BQL', '6.5e-4'),
+    across(.cols = c(C1Obs:PDRObs,Height:Scr,Alb),
+                .fns = as.numeric) ,
+    Sex=factor(Sex,
+               levels=c(0,1),
+               labels=c('male','female')))
+
+#all3trial
+#glimpse(all3trial)
+
+timed_data <- FindVars(varnames = 'Obs',allnames = cn(all3trial))
+state_data <- FindVars(c('eight','Scr','Alb'), allnames = cn(all3trial))
+```
+## Visualization of all variables
+```{r plot_of_all_variables}
+all3trial |>
+  filter(!is.na(Sex)) |> 
+  pivot_longer(cols = c(C1Obs:PDRObs,Height:Scr,Alb)) |>
+  ggplot(aes(value, fill=factor(Sex)))+
+  geom_density(alpha=.2)+
+  facet_wrap(facets = vars(name),
+             scales = 'free')
+
+cat('&nbsp;\n\n')
+```
+
+# Test for Normal distribution  
+```{r kstests}
+safe_ks <- purrr::possibly(ksnormal,otherwise = NA_real_)
+safe_shapiro <- possibly(shapiro.test,
+                         otherwise = list('p.value'=NA_real_))
+```
+## Static variables
+```{r static_variables}
+all3trial |>
+  filter(Time==0) |> #since the state_data cannot change for the other time points
+  group_by(Sex, StudyID) |> 
+  summarise(
+    across(.cols = state_data$names,
+           .fns = ~safe_ks(.x) |> formatP())) |> 
+  flextable() |> 
+  set_caption('Results from KS-Test static variables') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+
+```
+## Timed variables
+```{r Timed_variables}
+##StudyID 1
+all3trial |> 
+  filter(StudyID==1) |>
+  group_by(Sex,Time) |> 
+  summarise(
+    across(.cols = timed_data$names,
+           .fns = ~safe_shapiro(.x)$p.value |> formatP())) |> 
+  arrange(Time) |> 
+  flextable() |> 
+  set_caption('Results from Shapiro-Test timed variables in Study1') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+
+##StudyID 2
+all3trial |> 
+  filter(StudyID==2) |> 
+  group_by(Sex,Time) |> 
+  summarise(
+    across(.cols = timed_data$names,
+           .fns = ~safe_shapiro(.x)$p.value |> formatP())) |> 
+  arrange(Time) |> 
+  flextable() |> 
+  set_caption('Results from Shapiro-Test timed variables in Study2') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+
+##StudyID 3
+all3trial |> 
+  filter(StudyID==3) |> 
+  group_by(Sex,Time) |> 
+  summarise(
+    across(.cols = timed_data$names,
+           .fns = ~safe_shapiro(.x)$p.value |> formatP())) |> 
+  arrange(Time) |> 
+  flextable() |> 
+  set_caption('Results from Shapiro-Test timed variables in Study3') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('\\newpage\n\n')
+gaussvars <- FindVars(c('eight','Scr','Alb'), allnames = cn(all3trial))
+ordvars <- FindVars('Obs', allnames = cn(all3trial))
+  qualvars <- FindVars(c('ESRD','nD', 'Sex'), allnames = cn(all3trial))
+```
+# Group comparisons  
+## Normal  
+```{r gaussvars_analysis}
+#static variables
+all3trial |> 
+  filter(Time==0) |> 
+  group_by(Sex) |>
+  summarise(across(.cols = gaussvars$names,
+                   .fns = list(n=~length(na.omit(.x)),
+                               MeanSD=meansd,
+                               SEM=~SEM(.x) |> roundR()),
+                   .names = "{.col}__{.fn}"),
+            .groups = 'drop') %>% 
+  mutate_if(.predicate = is.numeric,.funs = as.character) %>% 
+  pivot_longer(cols = -Sex, 
+               names_to=c('Variable','what'),
+               values_to = 'Statistic',
+               names_pattern='(.+)__(.+)') %>% 
+  pivot_wider(names_from = c(what,Sex),
+              names_glue = '{what} ({Sex})',
+              values_from=Statistic) |>
+  flextable() |> 
+  set_caption('Group description for sex in variables with assumed Gaussian distribution') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+all3trial |> 
+  filter(Time==0) |> 
+  compare2numvars(
+    dep_vars = gaussvars$names,
+    indep_var = 'Sex',
+    gaussian = TRUE) |> 
+  # select(-p) |> 
+  flextable() |> 
+  set_caption('Group comparison for sex in variables with assumed Gaussian distribution') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+```
+
+## Ordinal  
+```{r ordvars_analysis}
+safe_mclb <- possibly(median_cl_boot,
+                      otherwise = tibble(median=NA_real_,
+                                         CIlow=NA_real_,
+                                         CIhigh=NA_real_))
+all3trial |> 
+  filter(Time==1) |> #chose time=1hr for the descriptive statistics
+  group_by(Sex) |>
+  summarise(across(.cols = ordvars$names,
+                   .fns = list(n=~length(na.omit(.x)),
+                               Desc=median_quart,
+                               CI_Median=~safe_mclb(.x) |>
+                                 select(-1) |> 
+                                 roundR() |> 
+                                 paste(collapse = ' .. ')),
+                   .names = "{.col}__{.fn}"),
+            .groups = 'drop') %>% 
+  mutate_if(.predicate = is.numeric,.funs = as.character) %>% 
+  pivot_longer(cols = -Sex, 
+               names_to=c('Variable','what'),
+               values_to = 'Statistic',
+               names_pattern='(.+)__(.+)') %>% 
+  pivot_wider(names_from = c(what,Sex),
+              names_glue = '{what} ({Sex})',
+              values_from=Statistic) |>
+  mutate(across(everything(),
+                ~str_replace(.x,
+                             pattern = 'NA .. NA',
+                             replacement = 'no data'))) |> 
+  flextable() |> 
+  set_caption('Group description for sex in ordinal variables') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+
+all3trial |> 
+  filter(Time==1) |> 
+  compare2numvars(
+    dep_vars = ordvars$names,
+    indep_var = 'Sex',
+    gaussian = FALSE)|> 
+  flextable() |> 
+  set_caption('Group comparison for sex in ordinal variables') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  theme_zebra()
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+```
+
+## Categorical  
+```{r qualvars_analysis}
+all3trial |> 
+  filter(Time==0) |> 
+  compare2qualvars(
+    dep_vars = qualvars$names[-1],
+    indep_var = 'Sex',
+    spacer = ' ') |> 
+  flextable() |> 
+  set_caption('Group comparison for sex in factorial variables') |> 
+  set_table_properties(width=1,layout='autofit') |> 
+  flextable::align(~p==' ',j = 1,
+                   align = 'center') |>    
+  flextable::bg(~p!=' ',bg = 'lightgrey') 
+cat('&nbsp;\n\n')
+cat('\\newpage\n\n')
+
+```
+# Plasma Parent Drug Concentration-Time profile per Study
+```{r C1Obs}
+#all3trial_obs <- all3trial |> 
+  #mutate(StudyID=factor(StudyID,
+               #levels=c(1,2,3),
+               #labels=c('Study1','Study2', 'Study3')))
+
+#all3trial_obs |>
+#ggplot(aes(x = Time, y = C1Obs, color = StudyID)) +
+  #geom_boxplot()
+
+ #grouping age into 4 bins
+all3trial$AgeBins <- cut(all3trial$Age, 4)
+#table(all3trial$AgeBins)
+
+cat('&nbsp;\n\n')
+
+
+```
+## C1Obs-Time Profile for Study 1
+```{r Study1}
+#Study1
+p1 <- all3trial |> 
+  filter(StudyID==1, ID %in% c(1:7)) |> 
+  #ggplot(aes(x=Time, y=C1Obs , colour = StudyID)) +
+  ggplot(aes(x=Time, y=C1Obs , colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  #facet_wrap(~ID)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile (21 mg)")
+
+p2 <- all3trial |> 
+  filter(StudyID==1, ID %in% c(8:14)) |> 
+  #ggplot(aes(x=Time, y=C1Obs , colour = StudyID)) +
+  ggplot(aes(x=Time, y=C1Obs , colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  #facet_wrap(~ID)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile (42 mg)")
+
+p3 <- all3trial |> 
+  filter(StudyID==1, ID %in% c(14:21)) |> 
+  #ggplot(aes(x=Time, y=C1Obs , colour = StudyID)) +
+  ggplot(aes(x=Time, y=C1Obs , colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  #facet_wrap(~ID)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration -Time Profile (84 mg)")
+
+(p1+p2)/p3
+
+#with these plots, we can extrapolate the Cmax, Tmax, AUC and Therapeutic range.
+
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+
+```
+## C1Obs-Time Profile for Study 2
+```{r Study2}
+#Study 2
+##Individuals without ESRD (=0)
+r1 <- all3trial |> 
+  filter(StudyID==2, ESRD ==0) |> 
+  ggplot(aes(x=Time, y=C1Obs , colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Individuals without ESRD C1Obs-Time Profile (70 mg)")
+
+# Individuals with ESRD (=1)
+r2 <- all3trial |> 
+  filter(StudyID==2, ESRD ==1) |> 
+  ggplot(aes(x=Time, y=C1Obs , colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Individuals with ESRD C1Obs-Time Profile (70 mg)")
+
+r1/r2
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+
+```
+## C1Obs-Time Profile for Study 3
+```{r Study3}
+#Study 3
+t1 <- all3trial |> 
+  filter(StudyID==3, DoseAMT==0, Time %in% c(0, 24, 48, 72, 96, 120, 144)) |> 
+  ggplot(aes(x=Time, y=C1Obs,colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  theme_minimal()+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Placebo Concentration -Time Profile")
+cat('&nbsp;\n\n')
+t2 <- all3trial |> 
+  filter(StudyID==3, DoseAMT==130, Time %in% c(0, 24, 48, 72, 96, 120, 144)) |> 
+  ggplot(aes(x=Time, y=C1Obs, colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile (130 mg)")
+
+  #t2 + facet_wrap(facets = vars(Sex))
+  t2 + facet_wrap(~Sex, ncol=2) +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Sex (130 mg)")
+  t2 + facet_wrap(~factor(AgeBins), ncol=2)  +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Age (130 mg)")
+cat('&nbsp;\n\n') 
+t3 <- all3trial |> 
+  filter(StudyID==3, DoseAMT==260, Time %in% c(0, 24, 48, 72, 96, 120, 144)) |> 
+  ggplot(aes(x=Time, y=C1Obs, colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile (260 mg)")
+
+  t3 + facet_wrap(~Sex, ncol=2) +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Sex (260 mg)") 
+  t3 + facet_wrap(~factor(AgeBins), ncol=2) +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Age (260 mg)")
+  cat('&nbsp;\n\n') 
+t4 <- all3trial |> 
+  filter(StudyID==3, DoseAMT==390, Time %in% c(0, 24, 48, 72, 96, 120, 144)) |> 
+  ggplot(aes(x=Time, y=C1Obs, colour = factor(ID))) +
+  geom_point(size= 3, alpha=0.3)+
+  geom_line(size = .5)+
+  xlab("Time (Hours)") + ylab("Plasma Concentration (mg/L)") +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile (390 mg)")
+
+  t4 + facet_wrap(~Sex, ncol=2) +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Sex (390 mg)")
+  t4 + facet_wrap(~factor(AgeBins), ncol=2) +
+  ggtitle("Plasma Parent Drug Concentration - \n Time Profile by Age (390 mg)")
+ 
+  t1/t2
+  
+cat('&nbsp;\n\n')
+cat('&nbsp;\n\n')
+  
+  t3/t4
+  
+cat('&nbsp;\n\n')
+cat('\\newpage\n\n')
+```
+# Non-Linear Regression Modeling
+## Study 1
+```{r Modeling}
+
+#for Study1
+all3trial_study1 <- all3trial |> 
+  filter(StudyID == 1)
+C1Obs <- all3trial_study1$C1Obs
+Time <- all3trial_study1$Time
+#find the parameters for the equation
+SS<-getInitial(C1Obs~SSlogis(Time,alpha,xmid,scale),
+               data=data.frame(C1Obs=C1Obs,Time=Time))
+
+K_start<-SS["alpha"]
+R_start<-1/SS["scale"]
+N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
+#the formula for the model
+log_formula<-formula(C1Obs~K*N0*exp(R*Time)/(K+N0*(exp(R*Time)-1)), data=all3trial_study1)
+#fit the model
+model<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start))
+#estimated parameters
+summary(model)
+#Formula: C1Obs ~ K * N0 * exp(R * Time)/(K + N0 * (exp(R * Time) - 1))
+
+#get some estimation of goodness of fit
+cor(C1Obs,predict(model))
+#[1] 0.6132112
+
+#plot
+C1Obs_Study1<- predict(model)
+plot(Time,C1Obs_Study1, type = "b", col="red",lty=2,lwd=3)
+
+
+
+```
