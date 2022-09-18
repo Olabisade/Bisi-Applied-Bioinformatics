@@ -1,0 +1,1 @@
+2022-09-19 01:07:43	6.1s	elated_sammet	OK	84856b39f26d9af0d84883c717981256	37c28d8a-57b2-4759-bfad-b1c0074b93c8	nextflow run task_Adegbesan.nf -profile singularity

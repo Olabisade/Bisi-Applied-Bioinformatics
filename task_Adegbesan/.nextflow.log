@@ -1,0 +1,78 @@
+Sep-19 01:07:42.951 [main] DEBUG nextflow.cli.Launcher - $> nextflow run task_Adegbesan.nf -profile singularity
+Sep-19 01:07:43.012 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 21.10.6
+Sep-19 01:07:43.036 [main] INFO  nextflow.cli.CmdRun - Launching `task_Adegbesan.nf` [elated_sammet] - revision: 84856b39f2
+Sep-19 01:07:43.052 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /home/cq/CQ/NGS/task_Adegbesan/nextflow.config
+Sep-19 01:07:43.053 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/cq/CQ/NGS/task_Adegbesan/nextflow.config
+Sep-19 01:07:43.087 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `singularity`
+Sep-19 01:07:43.773 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [singularity]
+Sep-19 01:07:43.804 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/cq/.nextflow/plugins
+Sep-19 01:07:43.806 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Sep-19 01:07:43.817 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Sep-19 01:07:43.819 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Sep-19 01:07:43.822 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Sep-19 01:07:43.833 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Sep-19 01:07:43.892 [main] DEBUG nextflow.Session - Session uuid: 37c28d8a-57b2-4759-bfad-b1c0074b93c8
+Sep-19 01:07:43.893 [main] DEBUG nextflow.Session - Run name: elated_sammet
+Sep-19 01:07:43.893 [main] DEBUG nextflow.Session - Executor pool size: 4
+Sep-19 01:07:43.929 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 21.10.6 build 5660
+  Created: 21-12-2021 16:55 UTC (17:55 CEST)
+  System: Linux 5.15.0-46-generic
+  Runtime: Groovy 3.0.9 on OpenJDK 64-Bit Server VM 11.0.16+8-post-Ubuntu-0ubuntu120.04
+  Encoding: UTF-8 (UTF-8)
+  Process: 3969@bioinfobox [127.0.1.1]
+  CPUs: 4 - Mem: 3.8 GB (1.1 GB) - Swap: 923.3 MB (923.3 MB)
+Sep-19 01:07:43.957 [main] DEBUG nextflow.Session - Work-dir: /home/cq/CQ/NGS/task_Adegbesan/work [ext2/ext3]
+Sep-19 01:07:43.957 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/cq/CQ/NGS/task_Adegbesan/bin
+Sep-19 01:07:43.968 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Sep-19 01:07:43.981 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Sep-19 01:07:44.015 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 5; maxThreads: 1000
+Sep-19 01:07:44.136 [main] DEBUG nextflow.Session - Session start invoked
+Sep-19 01:07:44.673 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Sep-19 01:07:44.764 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Sep-19 01:07:44.764 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sep-19 01:07:44.769 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Sep-19 01:07:44.774 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=4; memory=3.8 GB; capacity=4; pollInterval=100ms; dumpInterval=5m
+Sep-19 01:07:44.798 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 5; maxThreads: 1000
+Sep-19 01:07:44.873 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Sep-19 01:07:44.874 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sep-19 01:07:44.891 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Sep-19 01:07:44.891 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sep-19 01:07:44.896 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Sep-19 01:07:44.896 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sep-19 01:07:44.901 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Sep-19 01:07:44.902 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sep-19 01:07:44.905 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: mafftAligner, git_downloadFile, gb_downloadFile, trimalAutomated, allFiles
+Sep-19 01:07:44.906 [main] DEBUG nextflow.Session - Ignite dataflow network (5)
+Sep-19 01:07:44.906 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > gb_downloadFile
+Sep-19 01:07:44.907 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > git_downloadFile
+Sep-19 01:07:44.909 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > allFiles
+Sep-19 01:07:44.911 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > mafftAligner
+Sep-19 01:07:44.916 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > trimalAutomated
+Sep-19 01:07:44.917 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Sep-19 01:07:44.923 [main] DEBUG nextflow.Session - Session await
+Sep-19 01:07:45.159 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sep-19 01:07:45.168 [Task submitter] INFO  nextflow.Session - [8a/db9646] Submitted process > gb_downloadFile
+Sep-19 01:07:45.188 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sep-19 01:07:45.190 [Task submitter] INFO  nextflow.Session - [ef/983368] Submitted process > git_downloadFile
+Sep-19 01:07:46.012 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: git_downloadFile; status: COMPLETED; exit: 0; error: -; workDir: /home/cq/CQ/NGS/task_Adegbesan/work/ef/983368d374a155146daa7b6db0a849]
+Sep-19 01:07:46.048 [Task monitor] DEBUG n.util.BlockingThreadExecutorFactory - Thread pool name=FileTransfer; maxThreads=12; maxQueueSize=36; keepAlive=1m
+Sep-19 01:07:46.930 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: gb_downloadFile; status: COMPLETED; exit: 0; error: -; workDir: /home/cq/CQ/NGS/task_Adegbesan/work/8a/db9646003d355d6fed9608fc1d4cd1]
+Sep-19 01:07:46.976 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sep-19 01:07:46.976 [Task submitter] INFO  nextflow.Session - [83/f1df12] Submitted process > allFiles
+Sep-19 01:07:47.007 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: allFiles; status: COMPLETED; exit: 0; error: -; workDir: /home/cq/CQ/NGS/task_Adegbesan/work/83/f1df12cc78a899e2eb329bcdc91144]
+Sep-19 01:07:47.028 [Actor Thread 1] INFO  nextflow.container.SingularityCache - Pulling Singularity image https://depot.galaxyproject.org/singularity/mafft%3A7.508--hec16e2b_0 [cache /home/cq/CQ/NGS/task_Adegbesan/singularity_containers/depot.galaxyproject.org-singularity-mafft%3A7.508--hec16e2b_0.img]
+Sep-19 01:07:47.761 [Actor Thread 1] DEBUG nextflow.container.SingularityCache - Singularity pull complete image=https://depot.galaxyproject.org/singularity/mafft%3A7.508--hec16e2b_0 path=/home/cq/CQ/NGS/task_Adegbesan/singularity_containers/depot.galaxyproject.org-singularity-mafft%3A7.508--hec16e2b_0.img
+Sep-19 01:07:47.771 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sep-19 01:07:47.772 [Task submitter] INFO  nextflow.Session - [f7/c6bac0] Submitted process > mafftAligner
+Sep-19 01:07:48.118 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: mafftAligner; status: COMPLETED; exit: 0; error: -; workDir: /home/cq/CQ/NGS/task_Adegbesan/work/f7/c6bac096424ee63fee5d3befe2818e]
+Sep-19 01:07:48.122 [Actor Thread 1] INFO  nextflow.container.SingularityCache - Pulling Singularity image https://depot.galaxyproject.org/singularity/trimal%3A1.4.1--h9f5acd7_6 [cache /home/cq/CQ/NGS/task_Adegbesan/singularity_containers/depot.galaxyproject.org-singularity-trimal%3A1.4.1--h9f5acd7_6.img]
+Sep-19 01:07:48.844 [Actor Thread 1] DEBUG nextflow.container.SingularityCache - Singularity pull complete image=https://depot.galaxyproject.org/singularity/trimal%3A1.4.1--h9f5acd7_6 path=/home/cq/CQ/NGS/task_Adegbesan/singularity_containers/depot.galaxyproject.org-singularity-trimal%3A1.4.1--h9f5acd7_6.img
+Sep-19 01:07:48.851 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sep-19 01:07:48.851 [Task submitter] INFO  nextflow.Session - [69/568a5a] Submitted process > trimalAutomated
+Sep-19 01:07:49.034 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: trimalAutomated; status: COMPLETED; exit: 0; error: -; workDir: /home/cq/CQ/NGS/task_Adegbesan/work/69/568a5ac0e6b1ed8635d13bf30f11fd]
+Sep-19 01:07:49.037 [main] DEBUG nextflow.Session - Session await > all process finished
+Sep-19 01:07:49.038 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Sep-19 01:07:49.049 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=5; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=2.9s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=2; peakMemory=0; ]
+Sep-19 01:07:49.075 [main] DEBUG nextflow.CacheDB - Closing CacheDB done
+Sep-19 01:07:49.085 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
